@@ -126,9 +126,9 @@ python generate_invite_code.py
 
 ## 📄 开源许可
 
-*本项目基于 [MIT License](LICENSE) 开源。
-*This project uses the [frp](https://github.com/fatedier/frp) binary (`frpc`) which is licensed under the Apache License 2.0.
-*See `third_party/frp/LICENSE` for details.
+本项目基于 [MIT License](LICENSE) 开源。
+
+This project uses the [frp](https://github.com/fatedier/frp) binary (`frpc`) which is licensed under the Apache License 2.0.
 
 </details>
 
@@ -236,8 +236,8 @@ Contributions of any kind are welcome. If you have suggestions for improvement o
 
 ## 📄 License
 
-*This project is licensed under the [MIT License](LICENSE).
-*This project uses the [frp](https://github.com/fatedier/frp) binary (`frpc`) which is licensed under the Apache License 2.0.
-*See `third_party/frp/LICENSE` for details.
+This project is licensed under the [MIT License](LICENSE).
+
+This project uses the [frp](https://github.com/fatedier/frp) binary (`frpc`) which is licensed under the Apache License 2.0.
 
 </details>
