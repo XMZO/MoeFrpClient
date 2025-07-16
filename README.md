@@ -1,191 +1,183 @@
-# 萌！FRP 高级版全栈项目 (Moe-FRP-Advanced-Project)
+# 萌！FRP 高级客户端 (Moe! FRP Client)
 
-![Banner](https://img.shields.io/badge/%E8%90%8C%EF%BC%81FRP-%E5%85%A8%E6%A0%88%E9%A1%B9%E7%9B%AE-ff69b4?style=for-the-badge&logo=python&logoColor=white)
-![版本](https://img.shields.io/badge/版本-v1.0.3c-blue?style=for-the-badge)
-![技术栈](https://img.shields.io/badge/技术栈-PySide6%20%7C%20Flask%20%7C%20SQLite-green?style=for-the-badge)
-![许可](https://img.shields.io/badge/许可-MIT-lightgrey?style=for-the-badge)
+这是一个功能丰富、注重安全与用户体验的FRP（Fast Reverse Proxy）解决方案。它由一个轻量级的 **Flask** 后端服务器和一个功能强大的 **PySide6** 图形化桌面客户端组成，旨在为用户提供便捷、可同步、可分享的内网穿透服务管理。
 
-这是一个功能强大的 FRP (Fast Reverse Proxy) 图形化客户端与配套服务端的全栈解决方案。项目不仅提供了传统 frpc 的所有功能，还集成了账户系统、配置云同步、配置分享与订阅、在线节点管理等高级特性。
+部分代码使用 Gemini-2.5-pro 编写
 
-## ✨ 项目亮点
+[![Python](https://img.shields.io/badge/Python-3.12+-blue.svg)](https://www.python.org/)
+[![Flask](https://img.shields.io/badge/Flask-3.0-black.svg)](https://flask.palletsprojects.com/)
+[![PySide6](https://img.shields.io/badge/PySide6-6.9-brightgreen.svg)](https://www.qt.io/qt-for-python)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-*   **全功能图形界面**：基于 PySide6 构建，提供直观的节点和代理规则管理，无需手动编辑 TOML 文件。
-*   **云端同步**：将您的配置安全地保存在云端，在任何设备上登录即可恢复所有设置。
-*   **配置分享与订阅系统**：支持“模板分享”和“完整分享”两种模式，满足不同场景需求。
-*   **多重安全机制**：客户端与服务端通过版本密钥、核心组件哈希、动态挑战码等多重校验；用户密码使用 Argon2id 安全存储；本地“记住密码”凭证通过系统密钥环和本机唯一ID加密。
-*   **动态图片背景**：集成多个图片API，定时刷新萌图，提升使用愉悦感。
-*   **独立后台管理工具**：提供一个强大的命令行工具，用于生成邀请码、管理用户和重置密码。
+---
 
-## 📂 项目结构
+## ✨ 核心特性
 
-本项目包含两个核心部分，分别位于不同的子目录中：
+*   **☁️ 云端同步与配置管理**:
+    *   用户配置（节点、代理规则）可安全地存储在云端服务器。
+    *   支持多份独立配置文件的创建与管理。
+    *   支持游客模式，可在未登录状态下进行本地临时配置。
+
+*   **🤝 强大的分享与订阅系统**:
+    *   用户可将自己的配置创建为分享链接。
+    *   支持**完整模式**（订阅者使用固定配置）和**模板模式**（订阅者可自定义部分参数，如本地端口）。
+    *   分享者可以随时管理或撤销自己的分享。
+
+*   **🔐 注重安全的设计**:
+    *   **邀请码注册**: 控制用户来源，只有通过邀请码才能注册账户。
+    *   **增强登录**: 采用 **挑战-应答(Challenge-Response)** 机制验证客户端身份，结合客户端版本和核心组件哈希进行多重校验。
+    *   **强密码哈希**: 使用 **Argon2** 算法安全存储用户密码。
+    *   **本地加密**: 客户端使用系统密钥环(`keyring`)和设备指纹安全地存储“记住密码”信息。
+
+*   **🖥️ 丰富的图形化客户端**:
+    *   使用 PySide6 (Qt for Python) 构建，界面美观，操作直观。
+    *   内置FRP核心，通过独立的子进程运行，与主GUI进程隔离。
+    *   支持节点和代理规则的可视化增删改查。
+    *   集成趣味性的**图片浏览器**，可从多个API源获取并展示图片，增添使用乐趣。
+
+*   **🔧 便捷的服务端管理**:
+    *   提供一个功能强大的命令行管理工具 (`generate_invite_code.py`)。
+    *   支持交互式菜单和命令行参数两种模式，方便管理用户、邀请码和重置密码。
+
+##  项目结构
 
 ```
 frp_end/
-├── client/          # 客户端（图形界面程序）的所有源代码
-├── server/          # 服务端（API 后端）的所有源代码
-└── README.md        # 您正在阅读的这份主说明文档
+├── client/                      # 客户端目录
+│   ├── api/
+│   │   └── __init__.py          # API客户端模块封装
+│   ├── app.ico                  # 应用图标
+│   ├── config.py                # 客户端静态配置 (服务器URL, 版本号等)
+│   ├── Dialogs.py               # 所有对话框UI (登录, 编辑, 分享等)
+│   ├── frpc_runner.py           # 独立子进程，用于运行frpc核心服务
+│   ├── ImageLabel.py            # 自定义图片显示控件
+│   ├── main.py                  # 客户端主程序入口
+│   ├── MoeFrpClient.mfc         # (需自行提供) FRP核心动态链接库
+│   ├── requirements.txt         # 客户端Python依赖
+│   ├── security.py              # 加密管理器 (本地凭证安全存储)
+│   ├── threads.py               # 后台线程 (Ping, 日志读取, 图片获取等)
+│   └── utils.py                 # 工具函数 (资源路径, 哈希计算等)
+│
+└── server/                      # 服务端目录
+    ├── generate_invite_code.py  # 服务端管理脚本 (核心)
+    ├── requirements.txt         # 服务端Python依赖
+    ├── server.py                # Flask后端服务器主程序
+    ├── users.db                 # (自动生成) SQLite数据库文件
+    └── server.log               # (自动生成) 服务器日志
 ```
 
----
+## 🛠️ 技术栈
 
-## 🛠️ (一) 服务端 / Server
+*   **后端 (Server)**:
+    *   框架: **Flask**
+    *   数据库: **SQLite**
+    *   密码哈希: **Argon2**
+    *   速率限制: **Flask-Limiter**
 
-`server` 目录包含了项目的后端 API 服务和管理工具。
+*   **前端 (Client)**:
+    *   GUI框架: **PySide6 (Qt6)**
+    *   本地加密: **Cryptography**, **Keyring**
+    *   配置文件格式: **TOML**
+    *   HTTP通信: **Requests**
 
-### 1. 环境与依赖
+## 🚀 安装与部署
 
-*   Python 3.8+
-*   依赖库见 `server/requirements.txt`
+### 1. 服务端 (Server)
 
-### 2. 部署步骤
+服务端负责用户认证和配置存储。
 
-1.  **进入服务端目录**
-    ```bash
-    cd server
-    ```
-
-2.  **创建并激活虚拟环境 (推荐)**
-    ```bash
-    python -m venv venv
-    # Windows
-    .\venv\Scripts\activate
-    # macOS / Linux
-    source venv/bin/activate
-    ```
-
-3.  **安装依赖**
-    ```bash
-    pip install -r requirements.txt
-    ```
-
-4.  **初始化数据库**
-    首次运行 `server.py` 会自动创建 `users.db` 数据库文件。
-
-5.  **创建管理员账户**
-    服务端本身不提供注册管理员的接口。您需要通过客户端注册一个普通用户后，手动修改数据库：
-    ```bash
-    # (确保在 server 目录下执行)
-    sqlite3 users.db
-    
-    # 假设你已注册用户'myadmin'，将其角色提升为管理员
-    UPDATE users SET role = 'admin' WHERE nickname = 'myadmin';
-    .quit
-    ```
-    
-6.  **启动服务**
-    - **开发模式**:
-      ```bash
-      python server.py
-      ```
-      服务将运行在 `http://127.0.0.1:5000`。
-    - **生产环境 (推荐)**:
-      使用 Gunicorn 或其他 WSGI 服务器，并配合反向代理（如 Nginx, Caddy）来处理 HTTPS 和负载。
-      ```bash
-      gunicorn --worker-class gevent --workers 1 --threads 10 --bind 127.0.0.1:5000 --bind '[::1]:5000' server:app
-      ```
-   
-### 3. 后台管理
-
-`server` 目录下提供了一个强大的命令行管理工具 `generate_invite_code.py`。
-
-#### 用法
 ```bash
-# (确保在 server 目录下，并已激活虚拟环境)
+# 1. 进入服务端目录
+cd frp_end/server
 
-# 方式一：运行交互式菜单 (推荐)
-python generate_invite_code.py
+# 2. (推荐) 创建并激活Python虚拟环境
+python -m venv venv
+source venv/bin/activate  # on Windows: venv\Scripts\activate
 
-# 方式二：使用命令行参数直接操作
-# 查看状态
-python generate_invite_code.py --status
-# 生成5个邀请码
-python generate_invite_code.py --generate 5
-# 删除用户 'some_user'
-python generate_invite_code.py --delete-user some_user
-# 为用户 'some_user' 生成密码重置令牌
-python generate_invite_code.py --reset-password some_user
+# 3. 安装依赖
+pip install -r requirements.txt
+
+# 4. 运行服务器
+# 首次运行会自动创建 users.db 数据库文件
+python server.py
+# 服务器将默认在 http://127.0.0.1:5000 运行
 ```
-**核心功能**：生成/删除邀请码、查看状态、删除用户、重置用户密码。
+
+### 2. 客户端 (Client)
+
+客户端是用户与之交互的图形化界面程序。
+
+```bash
+# 1. 进入客户端目录
+cd frp_end/client
+
+# 2. (推荐) 创建并激活Python虚拟环境
+python -m venv venv
+source venv/bin/activate # on Windows: venv\Scripts\activate
+
+# 3. 安装依赖
+pip install -r requirements.txt
+
+# 4. (重要!) 放置核心组件
+# 将你的frpc核心动态链接库文件命名为 `MoeFrpClient.mfc` 并放置在此目录下。
+# 如果没有此文件，客户端将无法启动连接。
+
+# 5. 运行客户端
+python main.py
+```
+
+## 📖 使用指南
+
+### 服务端管理 (`generate_invite_code.py`)
+
+这是管理后台的核心工具，支持交互模式和命令行参数模式。
+
+**交互模式 (推荐):**
+
+```bash
+cd frp_end/server
+python generate_invite_code.py
+```
+
+启动后将看到菜单：
+*   **1. 查看邀请码状态**: 显示所有邀请码（未使用/已使用）和使用者信息。
+*   **2. 生成邀请码**: 创建一个新的或多个邀请码。
+*   **3. 删除邀请码**: 删除指定的邀请码或所有未使用的邀请码。
+*   **4. 删除用户**: 删除指定的用户及其所有数据。
+*   **5. 重置用户密码**: 为指定用户生成一个一次性的密码重置令牌。
+*   **6. 退出**
+
+**命令行模式:**
+
+*   **生成邀请码**: `python generate_invite_code.py -g 5` (生成5个)
+*   **查看状态**: `python generate_invite_code.py -s`
+*   **删除用户**: `python generate_invite_code.py -du <nickname>`
+*   **删除邀请码**: `python generate_invite_code.py -dc <invitation_code>`
+*   **重置密码**: `python generate_invite_code.py -rp <nickname>`
+
+### 客户端使用流程
+
+1.  **注册与登录**:
+    *   首次使用，向管理员索要一个**邀请码**进行注册。
+    *   使用注册的昵称和密码登录。可以选择“记住密码”以便安全地在本地保存凭证。
+
+2.  **配置管理**:
+    *   **游客模式**: 未登录时使用，配置仅存在于本地，关闭程序后可能会丢失。
+    *   **云端配置**: 登录后，可以创建、删除、编辑自己的云端配置文件。所有更改都可以通过点击“保存到云端”按钮进行同步。
+
+3.  **节点与代理**:
+    *   在选定的配置中，可以添加、编辑、删除**服务器节点**（你的frps服务器信息）。
+    *   可以添加、编辑、删除**代理规则**（如 `tcp`, `http` 等）。
+
+4.  **订阅分享**:
+    *   点击“添加订阅”，输入他人分享的ID，即可订阅。
+    *   如果订阅的是**模板分享**，你可以在客户端自定义本地端口等信息。
+    *   如果订阅的是**完整分享**，你将使用分享者预设的完整配置。
+
+5.  **启动连接**:
+    *   在“控制与日志”区域，从下拉框中选择要运行的**激活节点**。
+    *   点击“启动连接”按钮。连接日志将实时显示在下方的文本框中。
 
 ---
 
-## 💻 (二) 客户端 / Client
-
-`client` 目录包含了用户使用的图形界面程序的所有源代码和资源文件。
-
-### 1. 环境与依赖
-
-*   Python 3.8+
-*   PySide6 (Qt for Python)
-*   依赖库见 `client/requirements.txt`
-
-### 2. 核心资源文件说明
-
-在 `client` 目录下，有几个关键文件：
--   `main.py`: 客户端主程序入口。
--   `MoeFrpClient.mfc`: **加密后的核心组件**。这是客户端与服务端进行版本校验和身份认证的关键部分。
--   `app.ico` / `windows.ico`: 程序的图标文件。
--   `build.bat`: 用于 PyInstaller 打包的批处理脚本。
-
-### 3. 从源码运行
-
-1.  **进入客户端目录**
-    ```bash
-    cd client
-    ```
-
-2.  **创建并激活虚拟环境 (推荐)**
-    ```bash
-    python -m venv venv
-    # Windows
-    .\venv\Scripts\activate
-    # macOS / Linux
-    source venv/bin/activate
-    ```
-
-3.  **安装依赖**
-    ```bash
-    pip install -r requirements.txt
-    ```
-    
-4.  **运行客户端**
-    ```bash
-    python main.py
-    ```
-
-### 4. 打包为可执行文件 (.exe)
-
-`client` 目录下提供了一个 `build.bat` 批处理脚本，它使用 **PyInstaller** 将所有代码和资源打包成一个独立的 `.exe` 文件。
-
-1.  **安装 PyInstaller**
-    ```bash
-    pip install pyinstaller
-    ```
-2.  **执行打包脚本**
-    在 `client` 目录下，直接双击运行 `build.bat`，或者在命令行中执行：
-    ```bash
-    .\build.bat
-    ```
-3.  打包完成后，最终的可执行文件会出现在 `client/dist` 文件夹内。
-
-### 5. 功能简介
-
-客户端的使用方式非常直观，主要功能包括：
--   **注册/登录**：通过邀请码注册，支持“记住密码”功能。
--   **云同步**：登录后，所有配置（节点、代理规则、订阅）都可与云端同步。
--   **配置分享**：可将自己的配置以“模板”或“完整”模式分享给他人。
--   **订阅系统**：通过分享ID订阅他人配置。
--   **在线管理**：随时随地通过图形界面管理节点和代理规则。
--   **一键测速**：快速测试所有节点的延迟。
-
-详细的使用说明可以在程序界面上通过工具提示（Tooltips）获得。
-
----
-
-## 📝 开发者说明
-
--   **服务端安全**：服务端通过 `server.py` 中的 `TRUSTED_CLIENTS` 列表来验证客户端身份。若客户端核心组件 (`MoeFrpClient.mfc`) 或版本密钥 (`version_secret`) 发生变化，需要同时更新客户端和服务端的此部分配置。
--   **API 结构**：客户端的 `api/` 目录清晰地定义了所有与后端交互的接口，方便追踪和调试。
--   **UI与逻辑分离**：客户端 `Dialogs.py` 和 `threads.py` 的设计旨在将UI界面与耗时操作分离，保证了应用的响应性和稳定性。
--   **贡献代码**：欢迎通过 Fork & Pull Request 的方式为项目贡献代码。请确保您的代码风格与现有项目保持一致，并提供清晰的提交信息。
+希望这份文档能帮助您更好地理解和使用这个项目！
