@@ -1,8 +1,6 @@
-# 萌！FRP 高级客户端 (Moe! FRP Client)
+# 萌！FRP 高级客户端 (Moe! FRP Advanced Client)
 
 这是一个功能丰富、注重安全与用户体验的FRP（Fast Reverse Proxy）解决方案。它由一个轻量级的 **Flask** 后端服务器和一个功能强大的 **PySide6** 图形化桌面客户端组成，旨在为用户提供便捷、可同步、可分享的内网穿透服务管理。
-
-部分代码使用 Gemini-2.5-pro 编写
 
 [![Python](https://img.shields.io/badge/Python-3.12+-blue.svg)](https://www.python.org/)
 [![Flask](https://img.shields.io/badge/Flask-3.0-black.svg)](https://flask.palletsprojects.com/)
@@ -15,7 +13,7 @@
 
 *   **☁️ 云端同步与配置管理**:
     *   用户配置（节点、代理规则）可安全地存储在云端服务器。
-    *   支持多份独立配置文件的创建与管理。
+    *   支持多份独立配置文件的创建與管理。
     *   支持游客模式，可在未登录状态下进行本地临时配置。
 
 *   **🤝 强大的分享与订阅系统**:
@@ -28,6 +26,9 @@
     *   **增强登录**: 采用 **挑战-应答(Challenge-Response)** 机制验证客户端身份，结合客户端版本和核心组件哈希进行多重校验。
     *   **强密码哈希**: 使用 **Argon2** 算法安全存储用户密码。
     *   **本地加密**: 客户端使用系统密钥环(`keyring`)和设备指纹安全地存储“记住密码”信息。
+
+*   **👑 管理员权限**:
+    *   内置 `admin` 角色，特定API（如为用户重置密码）需要管理员权限才能调用，确保了高级操作的安全性。
 
 *   **🖥️ 丰富的图形化客户端**:
     *   使用 PySide6 (Qt for Python) 构建，界面美观，操作直观。
@@ -44,9 +45,14 @@
 ```
 frp_end/
 ├── client/                      # 客户端目录
-│   ├── api/
-│   │   └── __init__.py          # API客户端模块封装
-│   ├── app.ico                  # 应用图标
+│   ├── api/                     # 模块化的API客户端库
+│   │   ├── __init__.py          # 组装ApiClient, 暴露各模块接口
+│   │   ├── auth.py              # 处理用户认证、注册、会话
+│   │   ├── base.py              # 封装底层requests请求, 处理错误
+│   │   ├── config.py            # 处理云端配置的同步、获取
+│   │   └── share.py             # 处理分享与订阅相关API
+│   ├── app.ico                  # 通用应用图标
+│   ├── windows.ico              # PySide6主窗口图标
 │   ├── config.py                # 客户端静态配置 (服务器URL, 版本号等)
 │   ├── Dialogs.py               # 所有对话框UI (登录, 编辑, 分享等)
 │   ├── frpc_runner.py           # 独立子进程，用于运行frpc核心服务
@@ -126,6 +132,30 @@ pip install -r requirements.txt
 python main.py
 ```
 
+## 👑 管理员设置 (重要)
+
+系统中的某些高级功能（如代替用户重置密码）需要**管理员(admin)**权限。`admin`角色不会自动分配，需要数据库管理员**手动设置**，这是为了保证最高权限的安全性。
+
+请按以下步骤设置您的第一个管理员账户：
+
+1.  **注册一个普通账户**:
+    首先，使用客户端的注册功能，注册一个您打算用作管理员的账户（例如，昵称 `myadmin`）。
+
+2.  **定位数据库**:
+    找到服务端目录下的 `users.db` 文件。
+
+3.  **提升权限**:
+    使用任何SQLite数据库工具 (如 [DB Browser for SQLite](https://sqlitebrowser.org/)) 打开 `users.db` 文件。然后执行以下SQL命令：
+
+    ```sql
+    UPDATE users SET role = 'admin' WHERE nickname = '你的管理员昵称';
+    ```
+    例如，要将用户 `myadmin` 提升为管理员，命令为:
+    ```sql
+    UPDATE users SET role = 'admin' WHERE nickname = 'myadmin';
+    ```
+    保存更改后，该用户即拥有管理员权限。
+
 ## 📖 使用指南
 
 ### 服务端管理 (`generate_invite_code.py`)
@@ -144,7 +174,7 @@ python generate_invite_code.py
 *   **2. 生成邀请码**: 创建一个新的或多个邀请码。
 *   **3. 删除邀请码**: 删除指定的邀请码或所有未使用的邀请码。
 *   **4. 删除用户**: 删除指定的用户及其所有数据。
-*   **5. 重置用户密码**: 为指定用户生成一个一次性的密码重置令牌。
+*   **5. 重置用户密码**: 为指定用户生成一个一次性的密码重置令牌。**此操作需要您输入管理员账户的密码**。
 *   **6. 退出**
 
 **命令行模式:**
@@ -153,13 +183,14 @@ python generate_invite_code.py
 *   **查看状态**: `python generate_invite_code.py -s`
 *   **删除用户**: `python generate_invite_code.py -du <nickname>`
 *   **删除邀请码**: `python generate_invite_code.py -dc <invitation_code>`
-*   **重置密码**: `python generate_invite_code.py -rp <nickname>`
+*   **重置密码 (需要管理员权限)**: `python generate_invite_code.py -rp <nickname>`
 
 ### 客户端使用流程
 
 1.  **注册与登录**:
     *   首次使用，向管理员索要一个**邀请码**进行注册。
     *   使用注册的昵称和密码登录。可以选择“记住密码”以便安全地在本地保存凭证。
+    *   管理员账户和普通用户账户使用相同的登录入口。
 
 2.  **配置管理**:
     *   **游客模式**: 未登录时使用，配置仅存在于本地，关闭程序后可能会丢失。
@@ -180,4 +211,4 @@ python generate_invite_code.py
 
 ---
 
-希望这份文档能帮助您更好地理解和使用这个项目！
+希望这份更新后的文档能帮助您更好地理解和使用这个项目！
