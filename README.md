@@ -1,7 +1,7 @@
 # 萌！FRP 高级客户端 / Moe! FRP Client
 
 <div align="center">
-   
+ 
 > ⚠️ **提示**：本项目部分代码由 Google Gemini 2.5 Pro 辅助编写。
 
 ![Python](https://img.shields.io/badge/Python-3.12%2B-blue?logo=python)
@@ -19,7 +19,7 @@ A modern, cross-platform desktop client for [frp](https://github.com/fatedier/fr
 ![软件截图](assets/screenshot.png)
 
 ## 🏗️ 架构 / Architecture
- 
+
 ![项目架构图](assets/architecture.svg)
 
 ---
@@ -29,7 +29,7 @@ A modern, cross-platform desktop client for [frp](https://github.com/fatedier/fr
 
 ## 简介
 
-**萌！FRP 客户端** 是一个基于 Python 和 PySide6 构建的 `frp` 图形化工具。它旨在提供一个比原生命令行更直观、更易于管理的 `frpc` 操作体验，并引入了**云端同步**和**配置分享**等高级功能，以满足个人开发者和团队的复杂需求。
+**萌！FRP 客户端** 是一个基于 Python 和 PySide6 构建的 `frp` 图形化工具。它旨在提供一个比原生命令行更直观、更易于管理的 `frpc` 操作体验，并引入了**云端同步**和**配置分享**等高级功能，旨在为 `frp` 用户提供一个功能更丰富、操作更便捷的图形化管理方案。
 
 ## ✨ 主要功能
 
@@ -68,7 +68,7 @@ A modern, cross-platform desktop client for [frp](https://github.com/fatedier/fr
 ### **2. 服务端部署 (自托管用户)**
 ```bash
 # 1. 进入服务端目录
-cd frp_end/server
+cd server
 
 # 2. (推荐) 创建并激活虚拟环境
 python -m venv venv
@@ -113,7 +113,7 @@ pip install "requests[socks]"
 如果你是服务器管理员，可以使用管理工具与用户和邀请码进行交互：
 ```bash
 # 进入服务端目录
-cd frp_end/server
+cd server
 
 # 以交互模式启动管理工具
 python generate_invite_code.py
@@ -137,7 +137,7 @@ python generate_invite_code.py
 
 ## Introduction
 
-**Moe! FRP Client** is a graphical tool for `frp` built with Python and PySide6. It aims to provide a more intuitive and manageable user experience for `frpc` compared to the native command line, introducing advanced features like **cloud synchronization** and **profile sharing** to meet the complex needs of individual developers and teams.
+**Moe! FRP Client** is a graphical tool for `frp` built with Python and PySide6. It aims to provide a more intuitive and manageable user experience for `frpc` compared to the native command line, introducing advanced features like **cloud synchronization** and **profile sharing** to provide a more feature-rich and user-friendly graphical management solution for frp users.
 
 ## ✨ Key Features
 
@@ -176,7 +176,7 @@ python generate_invite_code.py
 ### **2. Server Deployment (For Self-Hosters)**
 ```bash
 # 1. Navigate to the server directory
-cd frp_end/server
+cd server
 
 # 2. (Recommended) Create and activate a virtual environment
 python -m venv venv
@@ -221,7 +221,7 @@ pip install "requests[socks]"
 If you are the server administrator, use the management tool to interact with users and invitation codes:
 ```bash
 # Navigate to the server directory
-cd frp_end/server
+cd server
 
 # Start the management tool in interactive mode
 python generate_invite_code.py
