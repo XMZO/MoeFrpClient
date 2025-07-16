@@ -8,6 +8,8 @@
 [![Flask](https://img.shields.io/badge/Flask-3.0-black.svg)](https://flask.palletsprojects.com/)
 [![PySide6](https://img.shields.io/badge/PySide6-6.9-brightgreen.svg)](https://www.qt.io/qt-for-python)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+> **注意**：本项目部分代码由 Google Gemini 2.5 Pro 辅助编写。
  
 ---
  

@@ -8,6 +8,8 @@ Moe! FRP is a feature-rich, security-focused, and user-friendly solution for man
 [![Flask](https://img.shields.io/badge/Flask-3.0-black.svg)](https://flask.palletsprojects.com/)
 [![PySide6](https://img.shields.io/badge/PySide6-6.9-brightgreen.svg)](https://www.qt.io/qt-for-python)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+> **Note**: Some parts of this project were developed with the assistance of Google's Gemini 2.5 Pro.
  
 ---
  
