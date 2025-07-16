@@ -10,9 +10,9 @@
 ![License](https://img.shields.io/badge/License-MIT-green)
 [![GitHub stars](https://img.shields.io/github/stars/XMZO/MoeFrpClient?style=social)](https://github.com/XMZO/MoeFrpClient/stargazers)
 
-一份为 [frp](https://github.com/fatedier/frp) 设计的、集成了云同步与配置分享功能的现代化跨平台桌面客户端。
+一份为 [frp](https://github.com/fatedier/frp) 设计的、集成了云同步与配置分享功能的现代化桌面客户端。
 
-A modern, cross-platform desktop client for [frp](https://github.com/fatedier/frp), featuring cloud synchronization and profile sharing capabilities.
+A modern desktop client for [frp](https://github.com/fatedier/frp), featuring cloud synchronization and profile sharing capabilities.
 
 </div>
 
