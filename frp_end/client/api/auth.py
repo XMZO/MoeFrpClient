@@ -43,6 +43,7 @@ class AuthEndpoints(BaseClient):
     
     def check_session(self, token):
         """检查会话令牌是否有效。"""
+        # 这个方法返回布尔值，所以我们在这里处理一下
         success, data = self._make_request(
             'POST', '/api/session/check',
             headers={'Authorization': f"Bearer {token}"}

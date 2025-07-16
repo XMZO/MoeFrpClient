@@ -6,7 +6,7 @@ from datetime import datetime
 
 def run_frpc_service(config_location, dll_path):
     """
-    【核心】子进程只负责加载和运行主进程提供的DLL。
+    子进程只负责加载和运行主进程提供的DLL。
     """
     try:
         if not dll_path or not os.path.exists(dll_path):

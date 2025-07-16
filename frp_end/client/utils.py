@@ -1,11 +1,46 @@
 # utils.py
 
-
-
 import hashlib
 import os
 import sys
 
+from PySide6.QtCore import QObject, QEvent
+from PySide6.QtGui import QCursor, QKeySequence
+from PySide6.QtWidgets import QApplication
+
+class GlobalCopyInterceptor(QObject):
+    def __init__(self, main_window, parent=None):
+        super().__init__(parent)
+        self.main_window = main_window
+ 
+    def eventFilter(self, watched, event):
+        # 只关心键盘按下事件
+        if event.type() == QEvent.Type.KeyPress:
+            # 检查是否是标准的“复制”快捷键
+            if event.matches(QKeySequence.StandardKey.Copy):
+                
+                # 获取主窗口的图片标签控件
+                image_label = self.main_window.placeholder_image_label
+                if not image_label:
+                    return super().eventFilter(watched, event)
+ 
+                # 检查鼠标是否在图片标签上
+                widget_under_cursor = QApplication.widgetAt(QCursor.pos())
+                is_on_image_label = False
+                temp_widget = widget_under_cursor
+                while temp_widget is not None:
+                    if temp_widget == image_label:
+                        is_on_image_label = True
+                        break
+                    temp_widget = temp_widget.parent()
+                
+                # 如果在图片上，则执行复制并拦截事件
+                if is_on_image_label:
+                    self.main_window.copy_current_image_to_clipboard()
+                    return True # 核心：拦截事件，不再传递
+ 
+        # 对于所有其他事件，正常传递
+        return super().eventFilter(watched, event)
 
 def resource_path(relative_path):
     """ 获取资源的绝对路径, 兼容开发模式和PyInstaller打包后的单文件模式 """

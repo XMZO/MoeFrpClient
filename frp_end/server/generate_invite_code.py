@@ -10,20 +10,20 @@ import json
 import hashlib
 import getpass
 
-
+# 确保脚本能找到数据库文件
 APP_BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATABASE = os.path.join(APP_BASE_DIR, 'users.db')
 SERVER_URL = "http://127.0.0.1:5000"
 
+# 从服务器端复制过来的客户端识别信息，必须保持一致
+# 这些可以放到一个共享的配置文件中
+CLIENT_VERSION = ""
+CLIENT_VERSION_STR = ""
+VERSION_SECRET = ""
+# 在这个脚本中，我们不校验DLL，所以可以留空或填一个假值
+DLL_HASH = ""
 
-
-CLIENT_VERSION = "999"
-CLIENT_VERSION_STR = "v9.9.9"
-VERSION_SECRET = "999"
-
-DLL_HASH = "999"
-
-
+# --- 邀请码生成逻辑 ---
 CUSTOM_CHARSET = string.ascii_uppercase.replace('I', '').replace('L', '').replace('O', '') + '23456789'
 def luhn_checksum(code_str):
     digits=[CUSTOM_CHARSET.find(c) for c in code_str]; s=0; p=len(digits)%2
@@ -40,7 +40,7 @@ def generate_secure_code():
     full_code = f"{code_body}{checksum}"
     return f"FRPT-{full_code[:4]}-{full_code[4:]}"
 
-
+# --- 数据库操作函数 ---
 def add_codes_to_db(db, count=1):
     if count<=0: return
     c=db.cursor(); g=[]
@@ -123,7 +123,7 @@ def delete_user(db, target):
         cursor.execute("DELETE FROM invitation_codes WHERE used_by_uuid = ?", (user_uuid,)); cursor.execute("DELETE FROM users WHERE uuid = ?", (user_uuid,)); db.commit()
         print(f"\n成功: 用户 '{user_nickname}' 及其所有关联数据已被彻底删除。")
 
-
+# --- 一个简化的 ApiClient ---
 class SimpleApiClient:
     def __init__(self, base_url):
         self.base_url = base_url.rstrip('/')
@@ -150,13 +150,13 @@ class SimpleApiClient:
             'version_secret': version_secret, 'dll_hash': dll_hash,
             'challenge': challenge, 'proof': proof
         })
-
+    
     def initiate_password_reset(self, token, target_nickname):
         return self._make_request('POST', '/api/initiate_password_reset',
                                   headers={"Authorization": f"Bearer {token}"},
                                   json={"nickname": target_nickname})
 
-
+# --- 重置密码函数，现在调用新的登录逻辑 ---
 def reset_user_password(db, api_client):
     if not display_user_list(db):return
     target_nickname=input("\n请输入要重置密码的用户昵称:").strip()
@@ -167,9 +167,9 @@ def reset_user_password(db, api_client):
     if success:
         token=data.get("reset_token");print("\n"+"*"*60+f"\n  ✅已为用户'{target_nickname}'生成令牌。\n  请将此【令牌】作为【邀请码】发给用户，去【注册】页面重设密码。\n\n      {token}\n\n  此令牌24小时内有效，且只能使用一次。\n"+"*"*60+"\n")
     else:print(f"->操作失败:{data}")
-
+    
 def display_user_list(db):
-
+    """一个专门用于显示用户列表的辅助函数"""
     cursor = db.cursor()
     cursor.execute("SELECT nickname, uuid FROM users ORDER BY nickname")
     users = cursor.fetchall()
@@ -182,13 +182,13 @@ def display_user_list(db):
 
 def interactive_menu(db, api_client):
     api_client = SimpleApiClient(SERVER_URL)
-
+    """交互式菜单"""
     while True:
         print("\n" + "=" * 50); print("    FRP高级客户端 - 服务端管理工具"); print("=" * 50)
         print("1. 查看邀请码状态"); print("2. 生成邀请码"); print("3. 删除邀请码")
         print("4. 删除用户"); print("5. 重置用户密码"); print("6. 退出"); print("-" * 50)
         choice = input("请选择操作 (1-6): ").strip()
-
+        
         if choice == '1': display_codes_status(db)
         elif choice == '2':
             try:
@@ -215,38 +215,38 @@ def wait_any_key(prompt="按任意键退出..."):
     try: import msvcrt; print(prompt, end='', flush=True); msvcrt.getch()
     except ImportError: input(prompt)
 
-
+# --- 安全的管理员登录函数 ---
 def admin_login_for_token(api_client):
-
+    """使用完整的挑战-响应流程进行管理员登录"""
     print("\n[安全操作] 需要管理员权限，请登录服务器账户。")
     nickname = input("请输入您的管理员昵称: ").strip()
     password = getpass.getpass("请输入您的管理员密码: ")
-
+    
     if not (nickname and password):
         print(" -> 错误: 昵称和密码不能为空。")
         return None
 
     try:
-
+        # 1. 获取挑战码
         print(" -> 正在获取安全挑战码...")
         success, data = api_client.get_login_challenge(nickname)
         if not success: raise Exception(f"获取挑战码失败: {data}")
         challenge = data.get('challenge')
-
-
+        
+        # 2. 计算登录证明
         print(" -> 正在计算登录证明...")
         message_to_hash = f"{VERSION_SECRET}:{DLL_HASH}:{CLIENT_VERSION}:{challenge}"
         h = hashlib.sha256()
         h.update(message_to_hash.encode('utf-8'))
         proof = h.hexdigest()
 
-
+        # 3. 执行登录
         print(" -> 正在发送登录请求...")
         success, data = api_client.login(
             nickname, password, CLIENT_VERSION, VERSION_SECRET, DLL_HASH, challenge, proof
         )
         if not success: raise Exception(f"{data}")
-
+            
         session_token = data.get("session_token")
         print(" -> 管理员登录成功！")
         return session_token
@@ -256,7 +256,7 @@ def admin_login_for_token(api_client):
         return None
 
 def request_password_reset_token(admin_session_token, target_nickname):
-
+    """使用管理员的token，为目标用户请求一个重置令牌"""
     print(f"正在为用户 '{target_nickname}' 请求密码重置令牌...")
     try:
         response = requests.post(
@@ -279,13 +279,13 @@ def request_password_reset_token(admin_session_token, target_nickname):
                 print(f" -> 操作失败: {response.json().get('error', '未知错误')}")
         else:
             print(f" -> 服务器错误 (状态码: {response.status_code}): {response.text}")
-
+            
     except requests.RequestException as e:
         print(f" -> 网络错误，无法连接到服务器: {e}")
 
 def main():
     parser = argparse.ArgumentParser(description="FRP高级客户端 - 服务端管理脚本", formatter_class=argparse.RawTextHelpFormatter)
-    api_client = SimpleApiClient(SERVER_URL)
+    api_client = SimpleApiClient(SERVER_URL) # 创建API客户端实例
     group = parser.add_mutually_exclusive_group()
     group.add_argument('-g', '--generate', nargs='?', type=int, const=1, default=None, metavar='COUNT', help="生成邀请码。不带数量则生成1个。")
     group.add_argument('-s', '--status', action='store_true', help="显示邀请码和用户状态。")
@@ -303,10 +303,10 @@ def main():
             elif args.status: display_codes_status(db)
             elif args.generate is not None: add_codes_to_db(db, args.generate); display_codes_status(db)
             if args.reset_password:
-
+                # 命令行重置密码也需要登录，并传入api_client
                 admin_token = admin_login_for_token(api_client)
                 if admin_token:
-
+                    # 注意：命令行模式下，我们直接调用API，不需要db对象
                     request_password_reset_token(admin_token, args.reset_password)
             else: parser.print_help()
             db.close()
