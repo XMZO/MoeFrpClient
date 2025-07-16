@@ -71,7 +71,8 @@ frp_end/
 │   ├── requirements.txt         # Python dependencies for the client
 │   ├── security.py              # Encryption Manager (secure local credential storage)
 │   ├── threads.py               # Background threads (Ping, LogReader, ImageFetcher)
-│   └── utils.py                 # Utility functions (resource path, hashes)
+│   ├── utils.py                 # Utility functions (resource path, hashes)
+│   └── proxy.py
 │
 └── server/                      # Server-side application
     ├── generate_invite_code.py  # Core server management script

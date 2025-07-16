@@ -72,7 +72,8 @@ frp_end/
 │   ├── requirements.txt         # 客户端Python依赖
 │   ├── security.py              # 加密管理器 (本地凭证安全存储)
 │   ├── threads.py               # 后台线程 (Ping, 日志读取, 图片获取等)
-│   └── utils.py                 # 工具函数 (资源路径, 哈希计算等)
+│   ├── utils.py                 # 工具函数 (资源路径, 哈希计算等)
+│   └── proxy.py
 │
 └── server/                      # 服务端目录
     ├── generate_invite_code.py  # 服务端管理脚本 (核心)
