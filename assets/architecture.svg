@@ -1,7 +1,6 @@
 <svg width="670" height="280" xmlns="http://www.w3.org/2000/svg" font-family="sans-serif" font-size="14px">
   <style>
-    .title { font-size: 16px; font-weight: bold; text-anchor: middle; }
-    .group-box { fill: none; stroke: #ccc; stroke-width: 1; rx: 5; ry: 5; }
+    .group-box { fill: #f9f9f9; stroke: #ccc; stroke-width: 1; rx: 5; ry: 5; }
     .group-label { font-size: 12px; font-style: italic; fill: #666; }
     .node-rect { stroke-width: 1.5; rx: 4; ry: 4; }
     .user-device-node { fill: #FFDDC1; stroke: #333; }
@@ -10,14 +9,15 @@
     .arrow-line { stroke: #333; stroke-width: 1.5; fill: none; }
     .arrow-head { fill: #333; }
     .arrow-label { font-size: 11px; fill: #333; font-weight: bold; }
+    .logical-link { stroke-dasharray: 4, 3; }
   </style>
   <!-- Groups -->
-  <rect x="10" y="30" width="280" height="200" class="group-box"/>
-  <text x="150" y="50" class="group-label">用户设备 (User's Device)</text>
-  <rect x="310" y="30" width="200" height="200" class="group-box"/>
-  <text x="410" y="50" class="group-label">云服务器 (Cloud Server)</text>
-  <rect x="530" y="30" width="130" height="120" class="group-box"/>
-  <text x="595" y="50" class="group-label">FRPS 服务器</text>
+  <rect x="10" y="30" width="280" height="220" class="group-box"/>
+  <text x="150" y="50" class="group-label" text-anchor="middle">用户设备 (User's Device)</text>
+  <rect x="310" y="30" width="200" height="150" class="group-box"/>
+  <text x="410" y="50" class="group-label" text-anchor="middle">云服务器 (Cloud Server)</text>
+  <rect x="530" y="30" width="130" height="150" class="group-box"/>
+  <text x="595" y="50" class="group-label" text-anchor="middle">FRPS 服务器</text>
   <!-- Nodes -->
   <rect x="40" y="70" width="220" height="40" class="node-rect user-device-node"/>
   <text x="150" y="95" text-anchor="middle">PySide6 客户端 GUI</text>
@@ -35,21 +35,25 @@
   <!-- 1. API请求 -->
   <path d="M 260 90 L 330 90" class="arrow-line"/>
   <polygon points="325,85 335,90 325,95" class="arrow-head"/>
-  <text x="295" y="85" class="arrow-label">1. API请求</text>
-  <!-- 2. 读写数据 -->
+  <text x="295" y="85" class="arrow-label" text-anchor="middle">1. API请求</text>
+  <!-- 2. 读/写数据 -->
   <path d="M 410 110 L 410 130" class="arrow-line"/>
   <polygon points="405,125 410,135 415,125" class="arrow-head"/>
-  <text x="415" y="125" class="arrow-label">2.</text>
-  <!-- 3. 加密解密 -->
-  <path d="M 150 180 q 0 -20 -40 -20 l -30 0 q -20 0 -20 -20 l 0 -50 q 0 -20 20 -20 l 30 0 q 40 0 40 -20" stroke-dasharray="4,2" class="arrow-line"/>
-  <polygon points="115,115 110,105 105,115" class="arrow-head"/>
-  <text x="60" y="120" class="arrow-label">3. 加密/解密</text>
-  <!-- 4. 启动进程 -->
+  <text x="435" y="125" class="arrow-label">2. 读/写数据</text>
+  <!-- 3. 存/取凭证 -->
+  <path d="M 150 110 L 150 190" class="arrow-line"/>
+  <polygon points="145,185 150,195 155,185" class="arrow-head"/>
+  <text x="180" y="175" class="arrow-label">3. 存/取凭证</text>
+  <!-- 4. 管理进程 -->
   <path d="M 150 110 L 150 130" class="arrow-line"/>
   <polygon points="145,125 150,135 155,125" class="arrow-head"/>
-  <text x="155" y="125" class="arrow-label">4.</text>
+  <text x="125" y="125" class="arrow-label">4. 管理进程</text>
   <!-- 5. 建立隧道 -->
-  <path d="M 260 150 L 545 150 L 545 110" class="arrow-line"/>
-  <polygon points="540,115 550,110 540,105" class="arrow-head"/>
-  <text x="400" y="145" class="arrow-label">5. 建立FRP隧道</text>
+  <path d="M 260 150 L 580 150 L 580 110" class="arrow-line"/>
+  <polygon points="575,115 585,110 575,105" class="arrow-head"/>
+  <text x="420" y="145" class="arrow-label" text-anchor="middle">5. 建立FRP隧道</text>
+  <!-- 6. 逻辑关系：提供节点信息 -->
+  <path d="M 490 90 L 545 90" class="arrow-line logical-link"/>
+  <polygon points="540,85 550,90 540,95" class="arrow-head"/>
+  <text x="517.5" y="80" class="arrow-label" text-anchor="middle">提供节点信息</text>
 </svg>
