@@ -2,6 +2,7 @@ import socket
 import time
 import requests
 from PySide6.QtCore import QThread, Signal, QByteArray
+from proxy import ProxyManager
 from utils import _get_value_from_path
 
 
@@ -49,54 +50,62 @@ class LogReaderThread(QThread):
 
 
 class ImageFetcherThread(QThread):
-
+    """
+    一个通用的、由配置驱动的图片获取线程。
+    它自己不关心API格式，只负责根据配置执行任务。
+    【已更新，仅图片加载通过代理】
+    """
     image_ready = Signal(QByteArray)
     error_occurred = Signal(str)
-
+ 
     def __init__(self, source_object, parent=None):
         super().__init__(parent)
         self.source = source_object
-
+ 
     def run(self):
         try:
+            proxies = ProxyManager.get_proxies()
+            headers = {'User-Agent': 'MoeFRP-Client/1.0'}
             image_data = None
             source_url = self.source.get("url")
-
+ 
             if self.source.get("is_api"):
-
-                print(f"[API Fetch] Stage 1: Fetching JSON from {source_url}")
-                api_response = requests.get(source_url, timeout=5)
+                # --- API类型处理 ---
+                print(f"[API Fetch] Stage 1 (via proxy): Fetching JSON from {source_url}")
+                
+                api_response = requests.get(source_url, timeout=5, proxies=proxies, headers=headers)
                 api_response.raise_for_status()
                 data = api_response.json()
-
-
+                
                 json_path = self.source.get("json_path")
                 if not json_path:
                     raise ValueError(f"API源 {source_url} 缺少 'json_path' 配置")
-
-
+ 
                 final_image_url = _get_value_from_path(data, json_path)
-
+ 
                 if not final_image_url or not isinstance(final_image_url, str):
                     raise ValueError(f"无法根据路径 '{json_path}' 在API响应中找到有效的图片URL")
-
-                print(f"[API Fetch] Stage 2: Fetching actual image from {final_image_url}")
-                image_response = requests.get(final_image_url, timeout=15)
+ 
+                print(f"[API Fetch] Stage 2 (via proxy): Fetching actual image from {final_image_url}")
+                image_response = requests.get(final_image_url, timeout=15, proxies=proxies, headers=headers)
                 image_response.raise_for_status()
                 image_data = image_response.content
-
+            
             else:
-
-                print(f"[Direct Fetch] Fetching from {source_url}")
-                response = requests.get(source_url, timeout=15)
+                print(f"[Direct Fetch] (via proxy): Fetching from {source_url}")
+                response = requests.get(source_url, timeout=15, proxies=proxies, headers=headers)
                 response.raise_for_status()
                 image_data = response.content
-
+ 
             if image_data:
                 self.image_ready.emit(QByteArray(image_data))
             else:
                 raise ValueError("最终未能获取到任何图片数据。")
-
+ 
         except Exception as e:
-
-            self.error_occurred.emit(f"获取图片失败: {e}")
+            if "Missing dependencies for SOCKS support" in str(e):
+                error_msg = ("SOCKS代理依赖缺失！请在命令行运行 'pip install \"requests[socks]\"' 后重启程序。")
+                print(f"[Proxy Error] {error_msg}")
+                self.error_occurred.emit(error_msg)
+            else:
+                self.error_occurred.emit(f"获取图片失败: {e}")
