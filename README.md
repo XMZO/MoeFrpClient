@@ -1,7 +1,7 @@
 # 萌！FRP 高级客户端 / Moe! FRP Client
 
 <div align="center">
-> 提示: 本项目部分代码由 Google Gemini 1.5 Pro 辅助编写。
+> **提示**: 本项目部分代码由 Google Gemini 2.5 Pro 辅助编写。
 
 ![Python](https://img.shields.io/badge/Python-3.12%2B-blue?logo=python)
 ![PySide6](https://img.shields.io/badge/UI-PySide6-orange?logo=qt)
