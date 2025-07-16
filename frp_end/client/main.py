@@ -25,13 +25,14 @@ from Dialogs import (LoginDialog, ManageSharesDialog, CreateShareDialog,
 
 from config import (
     CLOUD_SERVER_URL, CLIENT_VERSION, CLIENT_VERSION_STR, VERSION_SECRET,
-    IMAGE_SOURCES, IMAGE_REFRESH_INTERVAL_MS, IMAGE_FETCH_GLOBAL_TIMEOUT_MS
+    IMAGE_SOURCES, IMAGE_REFRESH_INTERVAL_MS, IMAGE_FETCH_GLOBAL_TIMEOUT_MS,
+    PROXY_URL
 )
 from utils import resource_path, get_file_sha256
 from security import EncryptionManager
 from frpc_runner import run_frpc_service
 from threads import PingThread, RefreshThread, LogReaderThread, ImageFetcherThread
-
+from proxy import ProxyManager
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -1376,8 +1377,11 @@ if __name__ == '__main__':
         dll_path_arg = sys.argv[2]
         run_frpc_service(config_location_arg, dll_path_arg)
     else:
+        if PROXY_URL:
+            ProxyManager.set_proxy(PROXY_URL)
+            print(f"[Image Proxy] 图片加载代理已配置为: {PROXY_URL}")
+ 
         app = QApplication(sys.argv)
-
         window = MainWindow()
         window.show()
         sys.exit(app.exec())
