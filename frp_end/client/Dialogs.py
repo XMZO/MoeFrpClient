@@ -259,7 +259,7 @@ class ImageViewerDialog(QDialog):
 
     def save_image(self):
 
-        format_str = self.image_format_bytes.toLower().data().decode('ascii', 'ignore')
+        format_str = self.image_format.data().decode('ascii', 'ignore') 
         if not format_str: format_str = 'png'
 
         default_filter = f"{format_str.upper()} 文件 (*.{format_str})"
@@ -268,10 +268,13 @@ class ImageViewerDialog(QDialog):
         timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
         default_filename = f"MoeFRP_{timestamp}.{format_str}"
 
+        from PySide6.QtCore import QStandardPaths
+        pictures_dir = QStandardPaths.writableLocation(QStandardPaths.PicturesLocation)
+        save_dir = pictures_dir or QDir.homePath()
         file_path, _ = QFileDialog.getSaveFileName(
             self,
             "保存图片",
-            os.path.join(QDir.picturesPath() or QDir.homePath(), default_filename),
+            os.path.join(save_dir, default_filename),
             filters
         )
 
