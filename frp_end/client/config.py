@@ -32,7 +32,7 @@ IMAGE_SOURCES = [
 ]
 IMAGE_REFRESH_INTERVAL_MS = 20000 # 图片刷新间隔（毫秒）
 IMAGE_FETCH_GLOBAL_TIMEOUT_MS = 15000 # 全局获取超时（15秒）
-PROXY_URL = "http://127.0.0.1:7890"
+PROXY_URL = ""
  
 # --- 应用基本信息 ---
 APP_BASE_DIR = os.path.dirname(os.path.abspath(__file__))
