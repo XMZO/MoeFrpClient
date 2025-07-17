@@ -7,7 +7,7 @@
 ![Python](https://img.shields.io/badge/Python-3.12%2B-blue?logo=python)
 ![PySide6](https://img.shields.io/badge/UI-PySide6-orange?logo=qt)
 ![Flask](https://img.shields.io/badge/Backend-Flask-black?logo=flask)
-![License](https://img.shields.io/badge/License-MIT-green)
+![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg)
 [![GitHub stars](https://img.shields.io/github/stars/XMZO/MoeFrpClient?style=social)](https://github.com/XMZO/MoeFrpClient/stargazers)
 
 一份为 [frp](https://github.com/fatedier/frp) 设计的、集成了云同步与配置分享功能的现代化桌面客户端。
