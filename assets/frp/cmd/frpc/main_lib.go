@@ -15,7 +15,7 @@ func StartFrpcService(configLocation *C.char) {
 	goConfigLocation := C.GoString(configLocation)
 
 	os.Args = []string{
-		"frpc", // 程序名可以硬编码
+		"frpc", // 程序名硬编码
 		"-c",
 		goConfigLocation,
 	}
