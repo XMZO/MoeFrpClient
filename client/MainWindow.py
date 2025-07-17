@@ -4,10 +4,10 @@ from Dialogs import CreateShareDialog, HardenedDelayDialog, ImageViewerDialog, L
 from ImageLabel import ImageLabel
 from api import ApiClient
 from api.base import BaseClient
-from config import CLIENT_VERSION, CLIENT_VERSION_STR, CLOUD_SERVER_URL, IMAGE_FETCH_GLOBAL_TIMEOUT_MS, IMAGE_REFRESH_INTERVAL_MS, IMAGE_SOURCES, VERSION_SECRET, CUTE_SAVE_AS_ICON_BASE64
+from config import CLIENT_VERSION, CLIENT_VERSION_STR, CLOUD_SERVER_URL, CUTE_COPY_AS_ICON_BASE64, CUTE_REFRESH_AS_ICON_BASE64, IMAGE_FETCH_GLOBAL_TIMEOUT_MS, IMAGE_REFRESH_INTERVAL_MS, IMAGE_SOURCES, VERSION_SECRET, CUTE_SAVE_AS_ICON_BASE64
 from security import EncryptionManager
 from threads import ImageFetcherThread, LogReaderThread, PingThread, RefreshThread
-from utils import get_file_sha256, resource_path, create_emoji_icon
+from utils import get_file_sha256, resource_path
 
 import toml
 from PySide6.QtCore import QBuffer, QByteArray, QIODevice, QSettings, QThread, QTimer, Qt, Signal
@@ -1454,15 +1454,20 @@ class MainWindow(QMainWindow):
             menu = QMenu(self)
 
             refresh_action = menu.addAction("刷新")
-            refresh_action.setIcon(create_emoji_icon("🔄"))
+            refresh_icon_pixmap = QPixmap()
+            refresh_icon_pixmap.loadFromData(base64.b64decode(CUTE_REFRESH_AS_ICON_BASE64))
+            refresh_action.setIcon(QIcon(refresh_icon_pixmap))
             copy_action = None
             save_action = None
             if self.current_image_data and not self.current_image_data.isEmpty():
                 copy_action = menu.addAction("复制")
-                copy_action.setIcon(create_emoji_icon("📋"))
+                copy_icon_pixmap = QPixmap()
+                copy_icon_pixmap.loadFromData(base64.b64decode(CUTE_COPY_AS_ICON_BASE64))
+                copy_action.setIcon(QIcon(copy_icon_pixmap))
                 save_action = menu.addAction("另存为...")
                 save_icon_pixmap = QPixmap()
                 save_icon_pixmap.loadFromData(base64.b64decode(CUTE_SAVE_AS_ICON_BASE64))
+                save_action.setIcon(QIcon(save_icon_pixmap))
             else:
                 save_action = None
 
