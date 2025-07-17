@@ -689,7 +689,6 @@ def request_config_ticket(user):
     )
     return jsonify({"success": True, "config_id": config_id})
 
-
 # 接口 2：凭票据获取配置
 @app.route('/api/get_temp_config/<string:config_id>', methods=['GET'])
 def get_temp_config(config_id):
@@ -771,7 +770,7 @@ def get_temp_config(config_id):
             if config_id in one_time_configs:
                 del one_time_configs[config_id]
             return "Configuration not found, expired, or already used.", 404
-
+            
 def cleanup_rate_limit_tracker():
     while True:
         # 每隔5分钟清理一次
