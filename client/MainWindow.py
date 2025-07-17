@@ -1,12 +1,13 @@
 # --- 主窗口 ---
+import base64
 from Dialogs import CreateShareDialog, HardenedDelayDialog, ImageViewerDialog, LoginDialog, ManageSharesDialog, NodeEditDialog, ProxyEditDialog, ProxySettingsDialog, QFileDialog
 from ImageLabel import ImageLabel
 from api import ApiClient
 from api.base import BaseClient
-from config import CLIENT_VERSION, CLIENT_VERSION_STR, CLOUD_SERVER_URL, IMAGE_FETCH_GLOBAL_TIMEOUT_MS, IMAGE_REFRESH_INTERVAL_MS, IMAGE_SOURCES, VERSION_SECRET
+from config import CLIENT_VERSION, CLIENT_VERSION_STR, CLOUD_SERVER_URL, IMAGE_FETCH_GLOBAL_TIMEOUT_MS, IMAGE_REFRESH_INTERVAL_MS, IMAGE_SOURCES, VERSION_SECRET, CUTE_SAVE_AS_ICON_BASE64
 from security import EncryptionManager
 from threads import ImageFetcherThread, LogReaderThread, PingThread, RefreshThread
-from utils import get_file_sha256, resource_path
+from utils import get_file_sha256, resource_path, create_emoji_icon
 
 import toml
 from PySide6.QtCore import QBuffer, QByteArray, QIODevice, QSettings, QThread, QTimer, Qt, Signal
@@ -157,7 +158,7 @@ class MainWindow(QMainWindow):
 
     def on_global_fetch_timeout(self):
         """
-        当整个图片获取流程超过预设时间后，此方法被调用。
+        【全新】当整个图片获取流程超过预设时间后，此方法被调用。
         """
         # 如果此时已经不处于“获取中”状态，说明是正常完成的，直接返回
         if not self.is_fetching_image:
@@ -178,7 +179,7 @@ class MainWindow(QMainWindow):
 
     def _try_fetch_from_source(self):
         """
-        使用 self.current_fetch_list 来获取源。
+        【微调】使用 self.current_fetch_list 来获取源。
         """
         if not self.current_fetch_list:
             print("[Image Fetch] 没有任何可用的图片源。")
@@ -222,7 +223,7 @@ class MainWindow(QMainWindow):
 
     def on_image_loaded(self, image_data: QByteArray):
         """
-        图片数据下载成功后的处理。
+        【最终优化版】图片数据下载成功后的处理。
         结合了QImageReader验证和显式格式判断，修复了重定向GIF的加载问题。
         """
         self.global_fetch_timeout_timer.stop()
@@ -300,7 +301,7 @@ class MainWindow(QMainWindow):
 
     def on_image_fetch_error(self, error_message: str):
         """
-        当单个源获取失败时调用。职责是递增索引并触发下一次尝试。
+        【修正】当单个源获取失败时调用。职责是递增索引并触发下一次尝试。
         """
         print(f"[Image Fetch Error] 源 {self.current_source_index} 失败: {error_message}")
 
@@ -313,7 +314,7 @@ class MainWindow(QMainWindow):
     def show_original_image(self):
         """
         当左下角图片被点击时，此槽函数被调用。
-        使用更严格的检查，确保数据非空才打开查看器。
+        【核心修正】: 使用更严格的检查，确保数据非空才打开查看器。
         """
         # 使用 QByteArray.isEmpty() 进行准确判断
         if self.current_image_data and not self.current_image_data.isEmpty():
@@ -430,7 +431,7 @@ class MainWindow(QMainWindow):
         self.proxy_settings_button.clicked.connect(self.open_proxy_settings_dialog)
 
     def open_proxy_settings_dialog(self):
-        """打开代理设置对话框，并应用新设置"""
+        """【全新版本】打开代理设置对话框，并应用新设置"""
         dialog = ProxySettingsDialog(self)
 
         # 用当前的设置初始化对话框
@@ -1452,12 +1453,16 @@ class MainWindow(QMainWindow):
 
             menu = QMenu(self)
 
-            refresh_action = menu.addAction("🔄 刷新")
+            refresh_action = menu.addAction("刷新")
+            refresh_action.setIcon(create_emoji_icon("🔄"))
             copy_action = None
             save_action = None
             if self.current_image_data and not self.current_image_data.isEmpty():
-                copy_action = menu.addAction("📋 复制")
-                save_action = menu.addAction("🖼️ 另存为...")
+                copy_action = menu.addAction("复制")
+                copy_action.setIcon(create_emoji_icon("📋"))
+                save_action = menu.addAction("另存为...")
+                save_icon_pixmap = QPixmap()
+                save_icon_pixmap.loadFromData(base64.b64decode(CUTE_SAVE_AS_ICON_BASE64))
             else:
                 save_action = None
 

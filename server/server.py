@@ -772,7 +772,6 @@ def get_temp_config(config_id):
                 del one_time_configs[config_id]
             return "Configuration not found, expired, or already used.", 404
 
-
 def cleanup_rate_limit_tracker():
     while True:
         # 每隔5分钟清理一次

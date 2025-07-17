@@ -4,8 +4,8 @@ import hashlib
 import os
 import sys
 
-from PySide6.QtCore import QObject, QEvent
-from PySide6.QtGui import QCursor, QKeySequence
+from PySide6.QtCore import QObject, QEvent, QSize
+from PySide6.QtGui import QCursor, QKeySequence, QPixmap, QIcon, QPainter, QColor, QFont
 from PySide6.QtWidgets import QApplication
 
 class GlobalCopyInterceptor(QObject):
@@ -62,6 +62,36 @@ def get_file_sha256(filepath):
         for byte_block in iter(lambda: f.read(4096), b""):
             sha256_hash.update(byte_block)
     return sha256_hash.hexdigest()
+
+def create_emoji_icon(emoji: str, size: int = 16) -> QIcon:
+    """
+    将一个Emoji字符转换为QIcon对象。
+ 
+    :param emoji: 要转换的Emoji字符，例如 "🔄"。
+    :param size: 图标的尺寸（宽度和高度）。
+    :return: 包含该Emoji的QIcon对象。
+    """
+    # 1. 创建一个指定大小的、透明的QPixmap作为画布
+    pixmap = QPixmap(QSize(size, size))
+    pixmap.fill(QColor("transparent"))  # 填充透明背景
+ 
+    # 2. 创建一个QPainter在Pixmap上绘制
+    painter = QPainter(pixmap)
+    
+    # 3. 设置字体
+    font = QFont()
+    font.setFamily("Segoe UI Emoji")
+    font.setPixelSize(int(size * 0.8)) # Emoji的大小通常比画布小一点，留出边距
+    painter.setFont(font)
+ 
+    # 4. 在画布中央绘制Emoji
+    #    Qt的drawText会自动处理字符的居中
+    painter.drawText(pixmap.rect(), 0, emoji) # 0表示水平和垂直都居中
+ 
+    # 5. 结束绘制
+    painter.end()
+ 
+    return QIcon(pixmap)
 
 def _get_value_from_path(data, path):
     """
