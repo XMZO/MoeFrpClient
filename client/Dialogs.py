@@ -51,7 +51,7 @@ class ProxySettingsDialog(QDialog):
         main_layout = QVBoxLayout(self)
         main_layout.addLayout(form_layout)
         
-        # ▼▼▼更新说明文字 ▼▼▼
+        # 说明文字
         note_label = QLabel(
             "<i><b>- 不使用代理:</b> 所有网络请求将直连，忽略任何系统代理。<br>"
             "<b>- 系统代理:</b> 自动使用您操作系统设置的代理。<br>"
