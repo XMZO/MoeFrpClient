@@ -157,7 +157,7 @@ class MainWindow(QMainWindow):
 
     def on_global_fetch_timeout(self):
         """
-        【全新】当整个图片获取流程超过预设时间后，此方法被调用。
+        当整个图片获取流程超过预设时间后，此方法被调用。
         """
         # 如果此时已经不处于“获取中”状态，说明是正常完成的，直接返回
         if not self.is_fetching_image:
@@ -178,7 +178,7 @@ class MainWindow(QMainWindow):
 
     def _try_fetch_from_source(self):
         """
-        【微调】使用 self.current_fetch_list 来获取源。
+        使用 self.current_fetch_list 来获取源。
         """
         if not self.current_fetch_list:
             print("[Image Fetch] 没有任何可用的图片源。")
@@ -222,7 +222,7 @@ class MainWindow(QMainWindow):
 
     def on_image_loaded(self, image_data: QByteArray):
         """
-        【最终优化版】图片数据下载成功后的处理。
+        图片数据下载成功后的处理。
         结合了QImageReader验证和显式格式判断，修复了重定向GIF的加载问题。
         """
         self.global_fetch_timeout_timer.stop()
@@ -300,7 +300,7 @@ class MainWindow(QMainWindow):
 
     def on_image_fetch_error(self, error_message: str):
         """
-        【修正】当单个源获取失败时调用。职责是递增索引并触发下一次尝试。
+        当单个源获取失败时调用。职责是递增索引并触发下一次尝试。
         """
         print(f"[Image Fetch Error] 源 {self.current_source_index} 失败: {error_message}")
 
@@ -313,7 +313,7 @@ class MainWindow(QMainWindow):
     def show_original_image(self):
         """
         当左下角图片被点击时，此槽函数被调用。
-        【核心修正】: 使用更严格的检查，确保数据非空才打开查看器。
+        使用更严格的检查，确保数据非空才打开查看器。
         """
         # 使用 QByteArray.isEmpty() 进行准确判断
         if self.current_image_data and not self.current_image_data.isEmpty():
@@ -430,7 +430,7 @@ class MainWindow(QMainWindow):
         self.proxy_settings_button.clicked.connect(self.open_proxy_settings_dialog)
 
     def open_proxy_settings_dialog(self):
-        """【全新版本】打开代理设置对话框，并应用新设置"""
+        """打开代理设置对话框，并应用新设置"""
         dialog = ProxySettingsDialog(self)
 
         # 用当前的设置初始化对话框
